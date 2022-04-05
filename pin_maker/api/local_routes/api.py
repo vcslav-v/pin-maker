@@ -28,7 +28,49 @@ def get_current_username(credentials: HTTPBasicCredentials = Depends(security)):
 
 @router.post('/make-plus-pin')
 def make_plus_pin(raw_pin: schemas.Pin, _: str = Depends(get_current_username)):
-    pin = service.make_plus_pin(raw_pin)
+    pin = service.make_pb_pin(raw_pin, mode='Plus')
+    return Response(
+        content=pin,
+        media_type='image/png',
+        headers={
+            'Content-Disposition': 'attachment; filename=result.png',
+            'pin-title': raw_pin.title,
+            'pin-description': raw_pin.description,
+        }
+    )
+
+
+@router.post('/make-premium-pin')
+def make_premium_pin(raw_pin: schemas.Pin, _: str = Depends(get_current_username)):
+    pin = service.make_pb_pin(raw_pin, mode='Premium')
+    return Response(
+        content=pin,
+        media_type='image/png',
+        headers={
+            'Content-Disposition': 'attachment; filename=result.png',
+            'pin-title': raw_pin.title,
+            'pin-description': raw_pin.description,
+        }
+    )
+
+
+@router.post('/make-freebie-pin')
+def make_freebie_pin(raw_pin: schemas.Pin, _: str = Depends(get_current_username)):
+    pin = service.make_pb_pin(raw_pin, mode='Freebie')
+    return Response(
+        content=pin,
+        media_type='image/png',
+        headers={
+            'Content-Disposition': 'attachment; filename=result.png',
+            'pin-title': raw_pin.title,
+            'pin-description': raw_pin.description,
+        }
+    )
+
+
+@router.post('/make-td-pin')
+def make_td_pin(raw_pin: schemas.Pin, _: str = Depends(get_current_username)):
+    pin = service.make_td_pin(raw_pin)
     return Response(
         content=pin,
         media_type='image/png',
