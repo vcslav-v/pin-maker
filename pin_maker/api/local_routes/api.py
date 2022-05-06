@@ -34,8 +34,6 @@ def make_plus_pin(raw_pin: schemas.Pin, _: str = Depends(get_current_username)):
         media_type='image/png',
         headers={
             'Content-Disposition': 'attachment; filename=result.png',
-            'pin-title': raw_pin.title,
-            'pin-description': raw_pin.description,
         }
     )
 
@@ -48,8 +46,6 @@ def make_premium_pin(raw_pin: schemas.Pin, _: str = Depends(get_current_username
         media_type='image/png',
         headers={
             'Content-Disposition': 'attachment; filename=result.png',
-            'pin-title': raw_pin.title,
-            'pin-description': raw_pin.description,
         }
     )
 
@@ -62,8 +58,6 @@ def make_freebie_pin(raw_pin: schemas.Pin, _: str = Depends(get_current_username
         media_type='image/png',
         headers={
             'Content-Disposition': 'attachment; filename=result.png',
-            'pin-title': raw_pin.title,
-            'pin-description': raw_pin.description,
         }
     )
 
@@ -76,7 +70,11 @@ def make_td_pin(raw_pin: schemas.Pin, _: str = Depends(get_current_username)):
         media_type='image/png',
         headers={
             'Content-Disposition': 'attachment; filename=result.png',
-            'pin-title': raw_pin.title,
-            'pin-description': raw_pin.description,
         }
     )
+
+
+@router.post('/parse-items-from-td-collection')
+def parse_items_from_td_collection(article_link: str, _: str = Depends(get_current_username)) -> schemas.PinList:
+    raw_pins = service.get_raw_pins(article_link)
+    return raw_pins

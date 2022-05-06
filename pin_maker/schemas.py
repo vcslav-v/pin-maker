@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel, validator
 
 
@@ -5,6 +6,7 @@ class Pin(BaseModel):
     img_url: str
     title: str
     description: str
+    link: Optional[str]
 
     @validator('title', 'description')
     def to_ascii(cls, row_string: str):
@@ -18,3 +20,7 @@ class Pin(BaseModel):
             if char == '—':
                 new_sting.append('-')
         return ''.join(new_sting)
+
+
+class PinList(BaseModel):
+    pins: list[Pin]
