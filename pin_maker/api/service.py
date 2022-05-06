@@ -36,10 +36,18 @@ def make_pb_pin(raw_pin: schemas.Pin, len_str=800, mode='Plus'):
         img = Image.open(os.path.join('pin_maker', 'graph_templates', 'FreebieBackground.png'))
         logo_img = Image.open(os.path.join('pin_maker', 'graph_templates', 'PBLogo.png'))
     img_draw = ImageDraw.Draw(img)
+    high_point_button = 1325
 
     hight_title = 837
     title_rows = raw_pin.title.split()
     title_rows = make_paragraph(title_rows, len_str, TITLE_FONT)
+    low_point_title = hight_title + len(title_rows) * 87
+    while low_point_title > high_point_button:
+        title_rows.pop()
+        if not title_rows:
+            break
+        title_rows[-1] = title_rows[-1][:-3] + '...'
+        low_point_title = hight_title + len(title_rows) * 87
     img_draw.text(
         (95, 837),
         '\n'.join(title_rows),
@@ -48,9 +56,16 @@ def make_pb_pin(raw_pin: schemas.Pin, len_str=800, mode='Plus'):
         spacing=12,
     )
 
-    hight_description = hight_title + len(title_rows) * 87 + 63
+    hight_description = low_point_title + 63
     description_rows = raw_pin.description.split()
     description_rows = make_paragraph(description_rows, len_str, DESCRIPTION_FONT)
+    low_point_desc = hight_description + len(description_rows) * 50 
+    while low_point_desc > high_point_button:
+        description_rows.pop()
+        if not description_rows:
+            break
+        description_rows[-1] = description_rows[-1][:-3] + '...'
+        low_point_desc = hight_description + len(description_rows) * 50
     img_draw.text(
         (100, hight_description),
         '\n'.join(description_rows),
