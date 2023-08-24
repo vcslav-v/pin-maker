@@ -15,6 +15,7 @@ pydantic = "^1.9.0"
 Pillow = "^9.0.1"
 requests = "^2.27.1"
 lxml = "^4.8.0"
+moviepy = "^1.0.3"
 
 [tool.poetry.dev-dependencies]
 flake8 = "^4.0.1"

@@ -4,3 +4,4 @@
 __pycache__
 .python-version
 setup.cfg
+pin_maker/.DS_Store

@@ -74,6 +74,18 @@ def make_td_pin(raw_pin: schemas.Pin, _: str = Depends(get_current_username)):
     )
 
 
+@router.post('/make-td-mov-pin')
+def make_td_mov_pin(raw_pin: schemas.MovePin, _: str = Depends(get_current_username)):
+    pin = service.make_td_mov_pin(raw_pin)
+    return Response(
+        content=pin,
+        media_type='video/mp4',
+        headers={
+            'Content-Disposition': 'attachment; filename=result.png',
+        }
+    )
+
+
 @router.post('/parse-items-from-td-collection')
 def parse_items_from_td_collection(article_link: str, _: str = Depends(get_current_username)) -> schemas.PinList:
     raw_pins = service.get_raw_pins(article_link)
