@@ -31,9 +31,9 @@ def make_plus_pin(raw_pin: schemas.Pin, _: str = Depends(get_current_username)):
     pin = service.make_pb_pin(raw_pin, mode='Plus')
     return Response(
         content=pin,
-        media_type='image/png',
+        media_type='image/jpg',
         headers={
-            'Content-Disposition': 'attachment; filename=result.png',
+            'Content-Disposition': 'attachment; filename=result.jpg',
         }
     )
 
@@ -43,9 +43,9 @@ def make_premium_pin(raw_pin: schemas.Pin, _: str = Depends(get_current_username
     pin = service.make_pb_pin(raw_pin, mode='Premium')
     return Response(
         content=pin,
-        media_type='image/png',
+        media_type='image/jpg',
         headers={
-            'Content-Disposition': 'attachment; filename=result.png',
+            'Content-Disposition': 'attachment; filename=result.jpg',
         }
     )
 
@@ -55,9 +55,9 @@ def make_freebie_pin(raw_pin: schemas.Pin, _: str = Depends(get_current_username
     pin = service.make_pb_pin(raw_pin, mode='Freebie')
     return Response(
         content=pin,
-        media_type='image/png',
+        media_type='image/jpg',
         headers={
-            'Content-Disposition': 'attachment; filename=result.png',
+            'Content-Disposition': 'attachment; filename=result.jpg',
         }
     )
 
@@ -67,9 +67,30 @@ def make_td_pin(raw_pin: schemas.Pin, _: str = Depends(get_current_username)):
     pin = service.make_td_pin(raw_pin)
     return Response(
         content=pin,
-        media_type='image/png',
+        media_type='image/jpg',
         headers={
-            'Content-Disposition': 'attachment; filename=result.png',
+            'Content-Disposition': 'attachment; filename=result.jpg',
+        }
+    )
+
+
+@router.post('/get-combinations-of-three')
+def get_combinations_of_three(
+    raw_pin: schemas.ProductLink, _: str = Depends(get_current_username)
+) -> schemas.ImgCombinations:
+    return service.make_combinations_for_glued(raw_pin.link)
+
+
+@router.post('/make-glued-pin')
+def make_glued_pin(
+    raw_pin: schemas.Pin, _: str = Depends(get_current_username)
+) -> schemas.ImgCombinations:
+    pin = service.make_glued_pin(raw_pin)
+    return Response(
+        content=pin,
+        media_type='image/jpg',
+        headers={
+            'Content-Disposition': 'attachment; filename=result.jpg',
         }
     )
 

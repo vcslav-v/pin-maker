@@ -2,8 +2,17 @@ from typing import Optional
 from pydantic import BaseModel, validator
 
 
+class ImgCombination(BaseModel):
+    img_urls: list[str]
+
+
+class ImgCombinations(BaseModel):
+    combinations: list[ImgCombination]
+
+
 class Pin(BaseModel):
-    img_url: str
+    img_url: Optional[str]
+    combinations: Optional[list[str]]
     title: str
     description: str
     link: Optional[str]
@@ -43,3 +52,39 @@ class MovePin(BaseModel):
             if char == '—':
                 new_sting.append('-')
         return ''.join(new_sting)
+
+
+class ProductLink(BaseModel):
+    link: str
+
+
+class Category(BaseModel):
+    name: str
+    url: str
+
+
+class Compatibility(BaseModel):
+    """Pydantic's model for the compatibility."""
+    name: str
+    url: str
+
+
+class ProductInfo(BaseModel):
+    pr_type: str
+    url: str
+    title: str
+    thumbnail_url: str
+    thumbnail_url_x2: str
+    main_img_url: str
+    main_img_url_x2: str
+    gallery_urls: list[str]
+    gallery_retina_urls: list[str]
+    exerpt: str
+    description: str
+    regular_price: Optional[float]
+    sale_regular_price: Optional[float]
+    categories: list[Category]
+    extended_price: Optional[float]
+    sale_extended_price: Optional[float]
+    compatibilities: list[Compatibility] = []
+    formats: list[str]

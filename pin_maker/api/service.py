@@ -5,6 +5,7 @@ import requests
 from lxml import etree
 from PIL import Image, ImageDraw, ImageFont
 from pin_maker import schemas
+from pin_maker.connectors import pb
 from glob import glob
 from moviepy.editor import ImageSequenceClip, AudioFileClip
 from datetime import datetime
@@ -13,6 +14,8 @@ from loguru import logger
 
 FRAMERATE = 30
 SLIDE_DURATION = 3 * FRAMERATE
+TARGET_WIDTH = 1000
+COMBINE_BORDER = 2
 
 TITLE_FONT = ImageFont.truetype(os.path.join('pin_maker', 'fonts', 'title.otf'), size=78)
 TD_TITLE_FONT = ImageFont.truetype(os.path.join('pin_maker', 'fonts', 'TDTitle.otf'), size=80)
@@ -97,7 +100,7 @@ def make_pb_pin(raw_pin: schemas.Pin, len_str=800, mode='Plus'):
     img.paste(logo_img, (59, 598), logo_img)
 
     result = io.BytesIO()
-    img.save(result, 'PNG')
+    img.save(result, 'JPEG')
     return result.getvalue()
 
 
@@ -156,7 +159,7 @@ def make_td_pin(raw_pin: schemas.Pin, len_str=800):
     img.paste(preview_img, (0, 0))
 
     result = io.BytesIO()
-    img.save(result, 'PNG')
+    img.save(result, 'JPEG')
     return result.getvalue()
 
 
@@ -203,6 +206,36 @@ def make_td_mov_pin(raw_pins: schemas.MovePin, len_str=800):
         result = result_file.read()
     os.remove(result_filename)
     return result
+
+
+@logger.catch
+def resize_with_fixed_width(img, target_width):
+    width_percent = (target_width / float(img.size[0]))
+    new_height = int((float(img.size[1]) * float(width_percent)))
+    img = img.resize((target_width, new_height))
+    return img
+
+
+@logger.catch
+def make_glued_pin(raw_pin: schemas.Pin):
+    main_img_raw = requests.get(raw_pin.combinations[0])
+    main_img = Image.open(io.BytesIO(main_img_raw.content))
+    main_img = resize_with_fixed_width(main_img, TARGET_WIDTH)
+    for img_url in raw_pin.combinations[1:]:
+        img_raw = requests.get(img_url)
+        img = Image.open(io.BytesIO(img_raw.content))
+        img = resize_with_fixed_width(img, TARGET_WIDTH)
+        combined_img = Image.new(
+            'RGB',
+            (main_img.size[0], main_img.size[1] + img.size[1] + COMBINE_BORDER),
+            'white'
+        )
+        combined_img.paste(main_img, (0, 0))
+        combined_img.paste(img, (0, main_img.height + COMBINE_BORDER))
+        main_img = combined_img
+    result = io.BytesIO()
+    main_img.save(result, 'JPEG')
+    return result.getvalue()
 
 
 def _get_disc_text(disc_elem):
@@ -354,3 +387,28 @@ def write_on(
         spacing=22
     )
     return next_bg
+
+
+def make_combinations_for_glued(link: str) -> schemas.ImgCombinations:
+    product_info = pb.get_product_info(link)
+    if product_info.pr_type == 'premium':
+        product_info.gallery_retina_urls = product_info.gallery_retina_urls[1:]
+    gallery_length = len(product_info.gallery_retina_urls)
+    unique_combinations = schemas.ImgCombinations(combinations=[])
+    if gallery_length == 0:
+        unique_combinations.combinations.append([product_info.main_img_url_x2])
+    elif gallery_length == 1:
+        unique_combinations.combinations.append(
+            [product_info.main_img_url_x2, product_info.gallery_retina_urls[0]]
+        )
+    else:
+        for i in range(gallery_length):
+            for j in range(i+1, gallery_length):
+                combination = sorted([product_info.gallery_retina_urls[i], product_info.gallery_retina_urls[j]])
+                combination = [product_info.main_img_url_x2] + combination
+                if combination not in unique_combinations:
+                    unique_combinations.combinations.append(
+                        schemas.ImgCombination(img_urls=combination)
+                    )
+
+    return unique_combinations
