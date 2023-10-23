@@ -217,11 +217,11 @@ def resize_with_fixed_width(img, target_width):
 
 
 @logger.catch
-def make_glued_pin(raw_pin: schemas.Pin):
-    main_img_raw = requests.get(raw_pin.combinations[0])
+def make_glued_pin(raw_pin: schemas.ImgCombination):
+    main_img_raw = requests.get(raw_pin.img_urls[0])
     main_img = Image.open(io.BytesIO(main_img_raw.content))
     main_img = resize_with_fixed_width(main_img, TARGET_WIDTH)
-    for img_url in raw_pin.combinations[1:]:
+    for img_url in raw_pin.img_urls[1:]:
         img_raw = requests.get(img_url)
         img = Image.open(io.BytesIO(img_raw.content))
         img = resize_with_fixed_width(img, TARGET_WIDTH)

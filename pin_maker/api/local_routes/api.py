@@ -83,8 +83,8 @@ def get_combinations_of_three(
 
 @router.post('/make-glued-pin')
 def make_glued_pin(
-    raw_pin: schemas.Pin, _: str = Depends(get_current_username)
-) -> schemas.ImgCombinations:
+    raw_pin: schemas.ImgCombination, _: str = Depends(get_current_username)
+):
     pin = service.make_glued_pin(raw_pin)
     return Response(
         content=pin,
