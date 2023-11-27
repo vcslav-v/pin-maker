@@ -959,7 +959,7 @@ attrs = ">=19.2.0"
 
 [[package]]
 name = "pb-admin"
-version = "0.1.21"
+version = "0.1.22"
 description = ""
 category = "main"
 optional = false
@@ -979,7 +979,7 @@ requests-toolbelt = "^1.0.0"
 type = "git"
 url = "https://github.com/vcslav-v/pb_admin.git"
 reference = "main"
-resolved_reference = "22ea1a7dd3aff85201b001d8ddc54265925f13bb"
+resolved_reference = "b316a7efbba319a18f99df1ef25ad6e4c88ec71f"
 
 [[package]]
 name = "pillow"

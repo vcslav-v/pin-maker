@@ -25,3 +25,10 @@ STANDARD_TEMPLATE_NAME = 'std_template'
 COLLAGE_TEMPLATE_NAME = 'collage_template'
 PIN_DESCRIPTION_COUNT = 500
 NESESSARY_DESC_COUNT = 100
+
+MAIN_BOARD_NAME = os.environ.get('MAIN_BOARD_NAME', '')
+FREEBIES_BOARD_NAME = os.environ.get('FREEBIES_BOARD_NAME', '')
+PLUS_BOARD_NAME = os.environ.get('PLUS_BOARD_NAME', '')
+PREMIUM_BOARD_NAME = os.environ.get('PREMIUM_BOARD_NAME', '')
+
+REF_CODE = os.environ.get('REF_CODE', '')

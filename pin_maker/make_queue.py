@@ -29,7 +29,7 @@ def _make_std_template(product: pb_schemas.Product, all_tags: list[pb_schemas.Ta
             or not full_product.title \
             or not full_product.description \
             or not full_product.slug \
-            or not full_product.category_ids:
+            or not full_product.url:
         return
     img_file = pin_templates.std_pin(full_product)
     img_space_key = space_tools.save_to_space(
@@ -60,7 +60,7 @@ def _make_collage_template(product: pb_schemas.Product, all_tags: list[pb_schema
             or not full_product.title \
             or not full_product.description \
             or not full_product.slug \
-            or not full_product.category_ids:
+            or not full_product.url:
         return
     img_combinations = pin_templates.make_combinations_for_glued(full_product)
     _tags = [tag for tag in all_tags if tag.ident in full_product.tags_ids]

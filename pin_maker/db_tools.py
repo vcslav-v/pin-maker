@@ -5,6 +5,21 @@ from pb_admin import schemas as pb_schemas
 from random import randint
 from sqlalchemy import func
 import uuid
+from pin_maker.config import MAIN_BOARD_NAME, FREEBIES_BOARD_NAME, PLUS_BOARD_NAME, PREMIUM_BOARD_NAME, REF_CODE
+
+from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
+
+
+def _prepare_url(url: str, new_params: dict) -> str:
+    # TODO: move it to pb_admin
+    parsed_url = urlparse(url)
+    params = parse_qs(parsed_url.query)
+    params.update(new_params)
+    query_string = urlencode(params, doseq=True)
+    new_url = urlunparse(
+        (parsed_url.scheme, parsed_url.netloc, parsed_url.path, parsed_url.params, query_string, parsed_url.fragment)
+    )
+    return new_url
 
 
 def get_cookies() -> list:
@@ -65,7 +80,10 @@ def save_pin_task(product: pb_schemas.Product, pin_description: str, pin_key_wor
         db_pin = models.Pin(
             product_id=product.ident,
             product_type=product.product_type,
-            product_url=f'{product.url}/?r={uuid.uuid4().hex[:8]}',
+            product_url=_prepare_url(product.url, {
+                'ref': REF_CODE,
+                'r': uuid.uuid4().hex[:8],
+            }),
             template_id=db_template.id,
             media_do_key=img_space_key,
             title=product.title,
