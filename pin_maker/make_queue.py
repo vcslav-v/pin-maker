@@ -19,9 +19,8 @@ def _remove_html_tags(html: str) -> str:
     return text
 
 
-def _make_std_template(product: pb_schemas.Product, all_tags: list[pb_schemas.Tag]):
+def _make_std_template(product: pb_schemas.Product, all_tags: list[pb_schemas.Tag], pb_session: pb_admin.PbSession):
     """Make pins by std template."""
-    pb_session = pb_admin.PbSession(SITE_URL, PB_LOGIN, PB_PASSWORD)
     full_product = pb_session.products.get(product.ident, product.product_type)
     full_product.description = _remove_html_tags(full_product.description)
     if not full_product.is_live \
@@ -50,9 +49,8 @@ def _make_std_template(product: pb_schemas.Product, all_tags: list[pb_schemas.Ta
     )
 
 
-def _make_collage_template(product: pb_schemas.Product, all_tags: list[pb_schemas.Tag]):
+def _make_collage_template(product: pb_schemas.Product, all_tags: list[pb_schemas.Tag], pb_session: pb_admin.PbSession):
     """Make pins by collage template."""
-    pb_session = pb_admin.PbSession(SITE_URL, PB_LOGIN, PB_PASSWORD)
     full_product = pb_session.products.get(product.ident, product.product_type)
     full_product.description = _remove_html_tags(full_product.description)
     if not full_product.is_live \
@@ -85,11 +83,12 @@ def _make_collage_template(product: pb_schemas.Product, all_tags: list[pb_schema
 
 def _make_pin_by_template(tasks: schemas.PinTask, all_tags: list[pb_schemas.Tag]):
     """Make pins by template."""
+    pb_session = pb_admin.PbSession(SITE_URL, PB_LOGIN, PB_PASSWORD)
     for product in tasks.products:
         if tasks.template_name == STANDARD_TEMPLATE_NAME:
-            _make_std_template(product, all_tags)
+            _make_std_template(product, all_tags, pb_session)
         elif tasks.template_name == COLLAGE_TEMPLATE_NAME:
-            _make_collage_template(product, all_tags)
+            _make_collage_template(product, all_tags, pb_session)
     db_tools.order_new_pins()
 
 
