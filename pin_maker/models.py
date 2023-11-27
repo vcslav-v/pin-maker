@@ -27,6 +27,7 @@ class Pin(Base):
     product_type: Mapped[str] = mapped_column()
     product_url: Mapped[str] = mapped_column()
     on_main_board: Mapped[bool] = mapped_column(default=False)
+    on_special_board: Mapped[Optional[bool]] = mapped_column(default=False, nullable=True)
     title: Mapped[Optional[str]] = mapped_column(nullable=True)
     description: Mapped[Optional[str]] = mapped_column(nullable=True)
     media_do_key: Mapped[Optional[str]] = mapped_column(nullable=True)

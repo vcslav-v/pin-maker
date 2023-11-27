@@ -24,7 +24,12 @@ def _make_std_template(product: pb_schemas.Product, all_tags: list[pb_schemas.Ta
     pb_session = pb_admin.PbSession(SITE_URL, PB_LOGIN, PB_PASSWORD)
     full_product = pb_session.products.get(product.ident, product.product_type)
     full_product.description = _remove_html_tags(full_product.description)
-    if not full_product.main_image_retina:
+    if not full_product.is_live \
+            or not full_product.main_image_retina \
+            or not full_product.title \
+            or not full_product.description \
+            or not full_product.slug \
+            or not full_product.category_ids:
         return
     img_file = pin_templates.std_pin(full_product)
     img_space_key = space_tools.save_to_space(
@@ -50,7 +55,12 @@ def _make_collage_template(product: pb_schemas.Product, all_tags: list[pb_schema
     pb_session = pb_admin.PbSession(SITE_URL, PB_LOGIN, PB_PASSWORD)
     full_product = pb_session.products.get(product.ident, product.product_type)
     full_product.description = _remove_html_tags(full_product.description)
-    if not full_product.main_image_retina:
+    if not full_product.is_live \
+            or not full_product.main_image_retina \
+            or not full_product.title \
+            or not full_product.description \
+            or not full_product.slug \
+            or not full_product.category_ids:
         return
     img_combinations = pin_templates.make_combinations_for_glued(full_product)
     _tags = [tag for tag in all_tags if tag.ident in full_product.tags_ids]
