@@ -1,5 +1,6 @@
 from typing import Optional
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, field_validator
+from pb_admin import schemas as pb_schemas
 
 
 class ImgCombination(BaseModel):
@@ -11,13 +12,14 @@ class ImgCombinations(BaseModel):
 
 
 class Pin(BaseModel):
-    img_url: Optional[str]
-    combinations: Optional[list[str]]
+    img_url: Optional[str] = None
+    combinations: Optional[list[str]] = None
     title: str
     description: str
     link: Optional[str]
 
-    @validator('title', 'description')
+    @field_validator('title', 'description')
+    @classmethod
     def to_ascii(cls, row_string: str):
         if row_string.isascii():
             return row_string
@@ -40,7 +42,8 @@ class MovePin(BaseModel):
     title: str
     description: str
 
-    @validator('title', 'description')
+    @field_validator('title', 'description')
+    @classmethod
     def to_ascii(cls, row_string: str):
         if row_string.isascii():
             return row_string
@@ -88,3 +91,9 @@ class ProductInfo(BaseModel):
     sale_extended_price: Optional[float]
     compatibilities: list[Compatibility] = []
     formats: list[str]
+
+
+class PinTask(BaseModel):
+    """Pydantic's model for the pin task."""
+    template_name: str
+    products: list[pb_schemas.Product]
