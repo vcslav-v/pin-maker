@@ -97,3 +97,15 @@ class PinTask(BaseModel):
     """Pydantic's model for the pin task."""
     template_name: str
     products: list[pb_schemas.Product]
+
+
+class PinRow(BaseModel):
+    """Pydantic's model for the pin row."""
+    db_ident: int
+    title: str
+    media_url: Optional[str] = None
+    media_key: str
+    board: str
+    description: str
+    link: str
+    key_words: str
