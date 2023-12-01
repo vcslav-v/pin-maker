@@ -1,5 +1,6 @@
 from boto3 import session as s3_session
 from pin_maker.config import DO_SPACE_BUCKET, DO_SPACE_REGION, DO_SPACE_ENDPOINT, DO_SPACE_KEY, DO_SPACE_SECRET
+from pin_maker import schemas
 
 
 def get_s3_link(key):
@@ -40,3 +41,25 @@ def save_to_space(data: str, template_name: str, pin_file_name: str) -> str:
         ContentType='application/octet-stream',
     )
     return key
+
+
+def prepare_pins(pins: list[schemas.PinRow]) -> list[schemas.PinRow]:
+    for pin in pins:
+        pin.media_url = get_s3_link(pin.media_key)
+    return pins
+
+
+def delete_from_space(keys: list[str]):
+    do_session = s3_session.Session()
+    client = do_session.client(
+        's3',
+        region_name=DO_SPACE_REGION,
+        endpoint_url=DO_SPACE_ENDPOINT,
+        aws_access_key_id=DO_SPACE_KEY,
+        aws_secret_access_key=DO_SPACE_SECRET
+    )
+    for key in keys:
+        client.delete_object(
+            Bucket=DO_SPACE_BUCKET,
+            Key=key,
+        )

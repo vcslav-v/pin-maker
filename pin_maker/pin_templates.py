@@ -9,6 +9,7 @@ from pin_maker.connectors import pb
 from glob import glob
 from loguru import logger
 from pb_admin import schemas as pb_schemas
+import random
 
 FRAMERATE = 30
 SLIDE_DURATION = 3 * FRAMERATE
@@ -128,7 +129,7 @@ def make_glued_pin(raw_pin: schemas.ImgCombination):
         combined_img.paste(main_img, (0, 0))
         combined_img.paste(img, (0, main_img.height + COMBINE_BORDER))
         main_img = combined_img
-    
+
     main_img = main_img.convert('RGB')
     result = io.BytesIO()
     main_img.save(result, 'JPEG')
@@ -293,10 +294,16 @@ def make_combinations_for_glued(product: pb_schemas.Product) -> schemas.ImgCombi
     gallery_length = len(gallery)
     unique_combinations = schemas.ImgCombinations(combinations=[])
     if gallery_length == 0:
-        unique_combinations.combinations.append([product.main_image_retina.original_url])
+        unique_combinations.combinations.append(
+            schemas.ImgCombination(
+                img_urls=[product.main_image_retina.original_url]
+            )
+        )
     elif gallery_length == 1:
         unique_combinations.combinations.append(
-            [product.main_image_retina.original_url, gallery[0]]
+            schemas.ImgCombination(
+                img_urls=[product.main_image_retina.original_url, gallery[0]]
+            )
         )
     else:
         for i in range(gallery_length):
@@ -307,5 +314,8 @@ def make_combinations_for_glued(product: pb_schemas.Product) -> schemas.ImgCombi
                     unique_combinations.combinations.append(
                         schemas.ImgCombination(img_urls=combination)
                     )
-
+    unique_combinations.combinations = random.sample(
+        unique_combinations.combinations,
+        min(len(unique_combinations.combinations), 50)
+    )
     return unique_combinations

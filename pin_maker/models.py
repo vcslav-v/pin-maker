@@ -47,3 +47,18 @@ class Template(Base):
     pin_limit_per_day: Mapped[int] = mapped_column(default=300)
 
     pins: Mapped[list['Pin']] = relationship(back_populates='template')
+
+    no_format_products: Mapped[list['NoFormatProduct']] = relationship(back_populates='template')
+
+
+class NoFormatProduct(Base):
+    '''NoFormatProduct.'''
+
+    __tablename__ = 'no_format_products'
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    product_id: Mapped[int] = mapped_column()
+    product_type: Mapped[str] = mapped_column()
+
+    template_id: Mapped[int] = mapped_column(ForeignKey('templates.id'))
+    template: Mapped['Template'] = relationship('Template', back_populates='no_format_products')
