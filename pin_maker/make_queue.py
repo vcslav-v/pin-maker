@@ -125,7 +125,7 @@ def refresh_queue():
     products = pb_session.products.get_list()
     logger.info(f'Got {len(products)} products.')
     new_tasks = db_tools.get_new_tasks(products)
-    logger.info(f'Got {len(new_tasks)} new tasks.')
+    logger.info(f'Got {sum([len(p.products) for p in new_tasks])} new tasks.')
     all_tags = pb_session.tags.get_list()
     for new_task in new_tasks:
         _make_pin_by_template(new_task, all_tags)
