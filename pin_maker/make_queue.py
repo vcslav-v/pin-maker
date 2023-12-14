@@ -25,8 +25,7 @@ def _make_std_template(product: pb_schemas.Product, all_tags: list[pb_schemas.Ta
     logger.info(f'Getting product {product.ident}...')
     full_product = pb_session.products.get(product.ident, product.product_type)
     full_product.description = _remove_html_tags(full_product.description)
-    if not full_product.is_live \
-            or not full_product.main_image_retina \
+    if not full_product.main_image_retina \
             or not full_product.title \
             or not full_product.description \
             or not full_product.slug \
@@ -64,8 +63,7 @@ def _make_collage_template(product: pb_schemas.Product, all_tags: list[pb_schema
     logger.info(f'Getting product {product.ident}...')
     full_product = pb_session.products.get(product.ident, product.product_type)
     full_product.description = _remove_html_tags(full_product.description)
-    if not full_product.is_live \
-            or not full_product.main_image_retina \
+    if not full_product.main_image_retina \
             or not full_product.title \
             or not full_product.description \
             or not full_product.slug \
