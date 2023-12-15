@@ -32,3 +32,8 @@ PLUS_BOARD_NAME = os.environ.get('PLUS_BOARD_NAME', '')
 PREMIUM_BOARD_NAME = os.environ.get('PREMIUM_BOARD_NAME', '')
 
 REF_CODE = os.environ.get('REF_CODE', '')
+
+
+UTM_API_URL = os.environ.get('UTM_API_URL', '')
+UTM_API_TOKEN = os.environ.get('UTM_API_TOKEN', '')
+UTM_API_USER = os.environ.get('UTM_API_USER', '')

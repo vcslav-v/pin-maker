@@ -1,4 +1,5 @@
 from pin_maker import db, models, schemas
+from pin_maker.connectors import utm
 from pin_maker.config import logger
 import json
 from pb_admin import schemas as pb_schemas
@@ -83,10 +84,11 @@ def save_pin_task(product: pb_schemas.Product, pin_description: str, pin_key_wor
         if not db_template:
             logger.error(f'No template with name {template_name}')
             return
+        utm_url = utm.get_utm(product.url, product.product_type)
         db_pin = models.Pin(
             product_id=product.ident,
             product_type=product.product_type,
-            product_url=_prepare_url(product.url, {
+            product_url=_prepare_url(utm_url, {
                 'ref': REF_CODE,
                 'r': uuid.uuid4().hex[:8],
             }),
