@@ -97,7 +97,7 @@ def _log_in_pinterest(driver: webdriver, cookies: list):
             exit(1)
 
 
-def send_pins(link_to_csv: str):
+def upload_csv(link_to_csv: str):
     with Browser() as browser:
         driver = browser.driver
         csv_path = _download_to_selenium(driver, link_to_csv)
