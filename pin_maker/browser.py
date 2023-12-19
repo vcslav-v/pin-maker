@@ -37,7 +37,6 @@ class Browser:
             sleep(5)
 
         self.driver = driver
-        self.driver = webdriver.Chrome()
 
     def close(self):
         self.driver.close()
