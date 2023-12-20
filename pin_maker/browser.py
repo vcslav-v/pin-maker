@@ -6,6 +6,7 @@ from loguru import logger
 from selenium import webdriver
 
 from pin_maker import do_app
+from pin_maker.config import AC_KEY
 
 
 class Browser:
@@ -28,7 +29,7 @@ class Browser:
             message = {
                     'receiver': 'antiCaptchaPlugin',
                     'type': 'setOptions',
-                    'options': {'antiCaptchaApiKey': os.environ.get('AC_KEY')},
+                    'options': {'antiCaptchaApiKey': AC_KEY},
                 }
             sleep(10)
             driver.execute_script(

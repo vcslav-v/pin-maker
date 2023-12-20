@@ -123,42 +123,53 @@ def get_pins_for_day() -> list[schemas.PinRow]:
     with db.SessionLocal() as session:
         db_templates = session.query(models.Template).all()
         result = []
+        db_titles = session.query(
+            models.Pin.title,
+        ).group_by(models.Pin.title).all()
+        db_titles = set([db_title[0] for db_title in db_titles])
         for db_template in db_templates:
-            db_pins = session.query(models.Pin).filter_by(template_id=db_template.id)
-            db_pins = db_pins.filter_by(on_main_board=False)
-            db_pins = db_pins.order_by(models.Pin.order).limit(db_template.pin_limit_per_day).all()
+            db_pins = session.query(models.Pin)
+            db_pins = db_pins.filter(models.Pin.title.in_(db_titles))
+            db_pins = db_pins.filter_by(template_id=db_template.id, on_main_board=False)
+            db_pins = db_pins.order_by(models.Pin.order)
+            db_pins = db_pins.limit(db_template.pin_limit_per_day).all()
             for db_pin in db_pins:
-                result.append(schemas.PinRow(
-                    db_ident=db_pin.id,
-                    title=db_pin.title,
-                    media_key=db_pin.media_do_key,
-                    description=db_pin.description,
-                    link=db_pin.product_url,
-                    key_words=db_pin.key_words,
-                    board=MAIN_BOARD_NAME
-                ))
+                if db_pin.title in db_titles:
+                    db_titles.remove(db_pin.title)
+                    result.append(schemas.PinRow(
+                        db_ident=db_pin.id,
+                        title=db_pin.title,
+                        media_key=db_pin.media_do_key,
+                        description=db_pin.description,
+                        link=db_pin.product_url,
+                        key_words=db_pin.key_words,
+                        board=MAIN_BOARD_NAME
+                    ))
         for db_template in db_templates:
-            db_pins = session.query(models.Pin).filter_by(template_id=db_template.id)
+            db_pins = session.query(models.Pin)
+            db_pins = db_pins.filter(models.Pin.title.in_(db_titles))
+            db_pins = db_pins.filter_by(template_id=db_template.id)
             db_pins = db_pins.filter_by(on_special_board=False, on_main_board=True)
-            db_pins = db_pins.order_by(models.Pin.order).all()
+            db_pins = db_pins.order_by(models.Pin.order)
+            db_pins = db_pins.limit(db_template.pin_limit_per_day).all()
             for db_pin in db_pins:
-
                 if db_pin.product_type == pb_schemas.ProductType.freebie:
                     _board = FREEBIES_BOARD_NAME
                 elif db_pin.product_type == pb_schemas.ProductType.plus:
                     _board = PLUS_BOARD_NAME
                 elif db_pin.product_type == pb_schemas.ProductType.premium:
                     _board = PREMIUM_BOARD_NAME
-
-                result.append(schemas.PinRow(
-                    db_ident=db_pin.id,
-                    title=db_pin.title,
-                    media_key=db_pin.media_do_key,
-                    description=db_pin.description,
-                    link=db_pin.product_url,
-                    key_words=db_pin.key_words,
-                    board=_board
-                ))
+                if db_pin.title in db_titles:
+                    db_titles.remove(db_pin.title)
+                    result.append(schemas.PinRow(
+                        db_ident=db_pin.id,
+                        title=db_pin.title,
+                        media_key=db_pin.media_do_key,
+                        description=db_pin.description,
+                        link=db_pin.product_url,
+                        key_words=db_pin.key_words,
+                        board=_board
+                    ))
         return result
 
 

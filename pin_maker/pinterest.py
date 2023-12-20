@@ -55,18 +55,14 @@ def _pinterest_login(driver: webdriver):
 
 def _send_csv_bulk(driver: webdriver, csv_path: str):
     driver.get('https://www.pinterest.com/settings/bulk-create-pins')
+    sleep(5)
     file_input = WebDriverWait(driver, 20).until(
         lambda x: x.find_element(By.ID, 'csv-input')
     )
     file_input.send_keys(csv_path)
-    try:
-        driver.WebDriverWait(driver, 20).until(
-            lambda x: x.find_element(By.XPATH, '//h1[contains(text(),"Upload successful")]')
-        )
-        logger.info('Upload successful')
-    except TimeoutException:
-        logger.error('Upload failed')
-        exit(1)
+    WebDriverWait(driver, 20).until(
+        lambda x: x.find_element(By.XPATH, '//h1[contains(text(),"Upload successful")]')
+    )
 
 
 def _is_logged_in(driver: webdriver):
@@ -85,23 +81,28 @@ def _log_in_pinterest(driver: webdriver, cookies: list):
     for cookie in cookies:
         driver.add_cookie(cookie)
     if not _is_logged_in(driver):
-        try:
-            is_logged = _pinterest_login(driver)
-        except:
-            logger.error('Login failed')
-            driver.quit()
-            exit(1)
+        is_logged = _pinterest_login(driver)
         if not is_logged:
             logger.error('Login failed')
-            driver.quit()
-            exit(1)
+            raise TimeoutException
 
 
-def upload_csv(link_to_csv: str):
+def upload_csv(links_to_csv: list[str]) -> bool:
     with Browser() as browser:
         driver = browser.driver
-        csv_path = _download_to_selenium(driver, link_to_csv)
+        csv_paths = [_download_to_selenium(driver, link_to_csv) for link_to_csv in links_to_csv]
         cookies = db_tools.get_cookies()
-        _log_in_pinterest(driver, cookies)
-        _send_csv_bulk(driver, csv_path)
+        try:
+            _log_in_pinterest(driver, cookies)
+        except:
+            logger.error('Login failed')
+            return False
+        for csv_path in csv_paths:
+            try:
+                _send_csv_bulk(driver, csv_path)
+            except TimeoutException:
+                logger.error(f'Upload failed - {csv_path}')
+                db_tools.update_cookies(driver.get_cookies())
+                return False
         db_tools.update_cookies(driver.get_cookies())
+        return True
