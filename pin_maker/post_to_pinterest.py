@@ -19,7 +19,7 @@ def main():
     if chunk:
         chunks.append(chunk)
     csv_keys = []
-    
+
     for i, part_of_pins in enumerate(chunks):
         with io.StringIO() as csv_file:
             writer = csv.writer(csv_file)

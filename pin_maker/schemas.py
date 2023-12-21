@@ -111,6 +111,14 @@ class PinRow(BaseModel):
     link: str
     key_words: str
 
+    @field_validator('key_words')
+    @classmethod
+    def to_short_key_words(cls, row_string: str):
+        by_words = row_string.split(', ')
+        if len(by_words) > 5:
+            return ', '.join(by_words[:5])
+        return row_string 
+
 
 class LinkCreate(BaseModel):
     '''LinkCreate.'''
